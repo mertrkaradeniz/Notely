@@ -1,23 +1,24 @@
-package com.mertrizakaradeniz.notely
+package com.mertrizakaradeniz.notely.ui.list
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.mertrizakaradeniz.notely.databinding.FragmentUpdateBinding
+import com.mertrizakaradeniz.notely.R
+import com.mertrizakaradeniz.notely.databinding.FragmentListBinding
 
 
-class UpdateFragment : Fragment(R.layout.fragment_update) {
+class ListFragment : Fragment(R.layout.fragment_list) {
 
-    private var _binding: FragmentUpdateBinding? = null
+    private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentUpdateBinding.inflate(inflater, container, false)
+        _binding = FragmentListBinding.inflate(inflater, container, false)
         return binding.root
     }
 

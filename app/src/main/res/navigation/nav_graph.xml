@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/ListFragment"
-        android:name="com.mertrizakaradeniz.notely.ListFragment"
+        android:name="com.mertrizakaradeniz.notely.ui.list.ListFragment"
         android:label="fragment_list"
         tools:layout="@layout/fragment_list" >
         <action
@@ -27,7 +27,7 @@
     </fragment>
     <fragment
         android:id="@+id/addFragment"
-        android:name="com.mertrizakaradeniz.notely.AddFragment"
+        android:name="com.mertrizakaradeniz.notely.ui.add.AddFragment"
         android:label="fragment_add"
         tools:layout="@layout/fragment_add" >
         <action
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/updateFragment"
-        android:name="com.mertrizakaradeniz.notely.UpdateFragment"
+        android:name="com.mertrizakaradeniz.notely.ui.update.UpdateFragment"
         android:label="fragment_update"
         tools:layout="@layout/fragment_update" >
         <action
