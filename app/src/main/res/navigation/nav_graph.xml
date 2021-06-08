@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/ListFragment"
         android:name="com.mertrizakaradeniz.notely.ui.list.ListFragment"
-        android:label="fragment_list"
+        android:label="To Do"
         tools:layout="@layout/fragment_list" >
         <action
             android:id="@+id/action_ListFragment_to_addFragment"
@@ -28,7 +28,7 @@
     <fragment
         android:id="@+id/addFragment"
         android:name="com.mertrizakaradeniz.notely.ui.add.AddFragment"
-        android:label="fragment_add"
+        android:label="Add"
         tools:layout="@layout/fragment_add" >
         <action
             android:id="@+id/action_addFragment_to_ListFragment"
@@ -39,12 +39,15 @@
     <fragment
         android:id="@+id/updateFragment"
         android:name="com.mertrizakaradeniz.notely.ui.update.UpdateFragment"
-        android:label="fragment_update"
+        android:label=""
         tools:layout="@layout/fragment_update" >
         <action
             android:id="@+id/action_updateFragment_to_ListFragment"
             app:destination="@id/ListFragment"
             app:enterAnim="@anim/from_right"
             app:exitAnim="@anim/to_left" />
+        <argument
+            android:name="currentToDo"
+            app:argType="com.mertrizakaradeniz.notely.data.model.ToDo" />
     </fragment>
 </navigation>

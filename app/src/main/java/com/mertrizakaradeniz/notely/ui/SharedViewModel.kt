@@ -12,7 +12,6 @@ import com.mertrizakaradeniz.notely.data.model.Priority
 import com.mertrizakaradeniz.notely.data.model.ToDo
 import dagger.hilt.android.lifecycle.HiltViewModel
 
-@HiltViewModel
 class SharedViewModel(application: Application) : AndroidViewModel(application) {
 
     val emptyDatabase: MutableLiveData<Boolean> = MutableLiveData(false)

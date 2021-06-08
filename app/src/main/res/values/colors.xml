@@ -11,6 +11,12 @@
     <color name="lightGray">#E6E6E6</color>
     <color name="darkGray">#4B4B4B</color>
     <color name="red">#FF4646</color>
-    <color name="yellow">#FFC114</color>
     <color name="green">#00C980</color>
+    <color name="blue_dark">#3B4FFE</color>
+    <color name="blue_light">#6283FF</color>
+    <color name="light_grey">#eeeeee</color>
+    <color name="light_blue">#00adb5</color>
+    <color name="grey">#393e46</color>
+    <color name="dark_grey">#222831</color>
+    <color name="yellow">#FFEB3B</color>
 </resources>

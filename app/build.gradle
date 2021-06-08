@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId "com.mertrizakaradeniz.notely"
-        minSdkVersion 23
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -80,4 +80,7 @@ dependencies {
 
     //Easy permission
     implementation 'com.vmadalin:easypermissions-ktx:1.0.0'
+
+    // RecyclerView Animator
+    implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
 }
