@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/google_darker_grey"
     android:layout_height="match_parent"
     tools:context=".ui.list.ListFragment">
 
@@ -25,8 +26,11 @@
         android:layout_marginBottom="24dp"
         android:clickable="true"
         android:focusable="true"
+        app:tint="@color/google_light_grey"
+        app:borderWidth="0dp"
+        app:elevation="0dp"
         android:src="@drawable/ic_add"
-        android:tint="@color/white"
+        android:backgroundTint="#2d2e32"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="ContentDescription" />
@@ -49,7 +53,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:alpha="0.5"
+        android:textColor="@color/google_light_grey"
         android:text="@string/no_data"
         android:textSize="16sp"
         android:visibility="invisible"

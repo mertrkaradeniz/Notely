@@ -23,11 +23,11 @@
             android:id="@+id/priorityIndicator"
             android:layout_width="16dp"
             android:layout_height="16dp"
-            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             app:cardCornerRadius="100dp"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@+id/tvTitle" />
 
         <TextView
             android:id="@+id/tvTitle"
@@ -36,7 +36,7 @@
             android:layout_marginStart="20dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:textColor="@color/darkGray"
+            android:textColor="@color/google_title_grey"
             android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/priorityIndicator"
@@ -54,7 +54,7 @@
             android:maxLength="300"
             android:maxLines="10"
             android:ellipsize="end"
-            android:textColor="@color/darkGray"
+            android:textColor="@color/google_grey"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tvTitle"

@@ -1,9 +1,11 @@
 package com.mertrizakaradeniz.notely.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.room.Room
 import com.mertrizakaradeniz.notely.data.local.ToDoDatabase
 import com.mertrizakaradeniz.notely.util.Constant.DATABASE_NAME
+import com.mertrizakaradeniz.notely.util.Constant.SHARED_PREFERENCES_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,4 +30,9 @@ object DatabaseModule {
     @Singleton
     @Provides
     fun provideToDoDao(toDoDatabase: ToDoDatabase) = toDoDatabase.getToDoDao()
+
+    @Singleton
+    @Provides
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
+        context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
 }

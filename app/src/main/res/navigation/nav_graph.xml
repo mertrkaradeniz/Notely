@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/ListFragment">
+    app:startDestination="@id/signInFragment">
 
     <fragment
         android:id="@+id/ListFragment"
@@ -24,11 +24,14 @@
             app:exitAnim="@anim/to_right"
             app:popEnterAnim="@anim/from_right"
             app:popExitAnim="@anim/to_left" />
+        <action
+            android:id="@+id/action_ListFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
     </fragment>
     <fragment
         android:id="@+id/addFragment"
         android:name="com.mertrizakaradeniz.notely.ui.add.AddFragment"
-        android:label="Add"
+        android:label=""
         tools:layout="@layout/fragment_add" >
         <action
             android:id="@+id/action_addFragment_to_ListFragment"
@@ -50,4 +53,21 @@
             android:name="currentToDo"
             app:argType="com.mertrizakaradeniz.notely.data.model.ToDo" />
     </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.mertrizakaradeniz.notely.ui.signin.SignInFragment"
+        android:label=""
+        tools:layout="@layout/fragment_sign_in" >
+        <action
+            android:id="@+id/action_signInFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_signInFragment_to_ListFragment"
+            app:destination="@id/ListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.mertrizakaradeniz.notely.ui.signup.SignUpFragment"
+        android:label=""
+        tools:layout="@layout/fragment_sign_up" />
 </navigation>
