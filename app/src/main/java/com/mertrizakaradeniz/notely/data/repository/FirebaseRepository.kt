@@ -14,7 +14,7 @@ class FirebaseRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firebaseStorage: FirebaseStorage
 ) {
-    fun getCurrentUser(): String? = firebaseAuth.currentUser?.uid
+    fun getCurrentUser() = firebaseAuth.currentUser
     fun getFirebaseStorage() = firebaseStorage.getReference(UPLOADED_FILES)
 
     fun signUp(email: String, password: String, onResult: (Resource<Task<AuthResult>>) -> Unit) {

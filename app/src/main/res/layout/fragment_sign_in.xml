@@ -12,9 +12,9 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/sign_up_to_keep"
+        android:text="@string/sign_in_to_keep"
         android:textAlignment="center"
-        android:textSize="20sp" />
+        android:textSize="24sp" />
 
     <TextView
         android:id="@+id/tvSubTitle"
@@ -22,13 +22,13 @@
         android:layout_height="wrap_content"
         android:text="@string/notes"
         android:textAlignment="center"
-        android:textSize="32sp" />
+        android:textSize="36sp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etEmailInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:hint="@string/email_address">
 
         <com.google.android.material.textfield.TextInputEditText

@@ -1,6 +1,7 @@
 package com.mertrizakaradeniz.notely.ui.signin
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +22,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     private var _binding: FragmentSignInBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: FirebaseViewModel by viewModels()
+    private val firebaseViewModel: FirebaseViewModel by viewModels()
 
     private lateinit var email: String
     private lateinit var password: String
@@ -40,13 +41,20 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         handleClickEvent()
     }
 
+    override fun onStart() {
+        super.onStart()
+        if (firebaseViewModel.checkUserLoggedIn()) {
+            findNavController().navigate(R.id.action_signInFragment_to_ListFragment)
+        }
+    }
+
     private fun handleClickEvent() {
         binding.apply {
             btnSignIn.setOnClickListener {
                 email = etEmail.text.toString()
                 password = etPassword.text.toString()
                 if (email.isNotEmpty() && password.isNotEmpty()) {
-                    viewModel.signIn(email, password)
+                    firebaseViewModel.signIn(email, password)
                 }
             }
             tvSignUp.setOnClickListener {
@@ -61,7 +69,8 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     }
 
     private fun setupObservers() {
-        viewModel.signInResult.observe(viewLifecycleOwner) { resource ->
+
+        firebaseViewModel.signInResult.observe(viewLifecycleOwner) { resource ->
             when(resource) {
                 is Resource.Success -> {
                     (requireActivity() as MainActivity).hideProgressBar()

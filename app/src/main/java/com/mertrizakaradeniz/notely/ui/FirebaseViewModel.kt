@@ -59,11 +59,9 @@ class FirebaseViewModel @Inject constructor(
         }
     }
 
-    /*fun download(fileUri: Uri) {
-        firebaseRepository.download(fileUri) { resource ->
-            _filePath.postValue(resource.data)
-        }
-    }*/
+    fun checkUserLoggedIn(): Boolean {
+        return firebaseRepository.getCurrentUser() != null
+    }
 
     private fun getFilePath(fileUri: Uri) {
         firebaseRepository.getFirebaseStorage()
