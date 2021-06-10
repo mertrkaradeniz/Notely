@@ -12,5 +12,6 @@ data class ToDo(
     var id: Int,
     var title: String,
     var priority: Priority,
-    var description: String
+    var description: String,
+    var imageUrl: String = ""
 ): Parcelable

@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -31,6 +30,8 @@ class AddFragment : Fragment(R.layout.fragment_add) {
     private val toDoViewModel: ToDoViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
     private val firebaseViewModel: FirebaseViewModel by viewModels()
+
+    private lateinit var imageUrl: String
 
     private var currentFile: Uri? = null
 
@@ -63,8 +64,8 @@ class AddFragment : Fragment(R.layout.fragment_add) {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.menu_add) {
-            insertToDo()
+        when (item.itemId) {
+            R.id.menu_add -> insertToDo()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -76,43 +77,32 @@ class AddFragment : Fragment(R.layout.fragment_add) {
             val priority = spPriorities.selectedItem.toString()
             val validation = sharedViewModel.verifyDataFromUser(title, description)
             if (validation) {
-                val newData = ToDo(
-                    0,
-                    title,
-                    sharedViewModel.parsePriority(priority),
-                    description
+                if (binding.imageView.drawable != null) {
+                    getImageUrl()
+                } else {
+                    imageUrl = ""
+                }
+                toDoViewModel.insertData(
+                    ToDo(
+                        0,
+                        title,
+                        sharedViewModel.parsePriority(priority),
+                        description,
+                        imageUrl
+                    )
                 )
-                firebaseViewModel.fileUploadResult.observe(viewLifecycleOwner, { resource ->
-                    when (resource) {
-                        is Resource.Success -> {
-                            (requireActivity() as MainActivity).hideProgressBar()
-                            toDoViewModel.insertData(newData)
-                            Toast.makeText(
-                                requireContext(),
-                                "Successfully added!",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            firebaseViewModel.filePath.observe(viewLifecycleOwner, {
-                                Log.d("SAAS", it)
-                            })
-                            findNavController().navigate(R.id.action_addFragment_to_ListFragment)
-                        }
-                        is Resource.Error -> {
-                            (requireActivity() as MainActivity).hideProgressBar()
-                            Toast.makeText(
-                                requireContext(),
-                                "Image uploading is failed",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        is Resource.Loading -> {
-                            (requireActivity() as MainActivity).showProgressBar()
-                        }
-                    }
-                })
+                Toast.makeText(
+                    requireContext(),
+                    "Successfully added!",
+                    Toast.LENGTH_SHORT
+                ).show()
+                findNavController().navigate(R.id.action_addFragment_to_ListFragment)
             } else {
-                Toast.makeText(requireContext(), "Please fill out all fields.", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(
+                    requireContext(),
+                    "Please fill out all fields.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -126,6 +116,31 @@ class AddFragment : Fragment(R.layout.fragment_add) {
                 firebaseViewModel.upload(currentFile!!)
             }
         }
+    }
+
+    private fun getImageUrl() {
+        firebaseViewModel.fileUploadResult.observe(viewLifecycleOwner, { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    (requireActivity() as MainActivity).hideProgressBar()
+                    firebaseViewModel.filePath.observe(viewLifecycleOwner, { url ->
+                        imageUrl = url
+                    })
+                }
+                is Resource.Error -> {
+                    imageUrl = ""
+                    (requireActivity() as MainActivity).hideProgressBar()
+                    Toast.makeText(
+                        requireContext(),
+                        "Image uploading is failed",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is Resource.Loading -> {
+                    (requireActivity() as MainActivity).showProgressBar()
+                }
+            }
+        })
     }
 
     override fun onDestroy() {

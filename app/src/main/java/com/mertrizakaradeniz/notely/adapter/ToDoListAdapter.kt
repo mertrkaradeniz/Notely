@@ -5,6 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.mertrizakaradeniz.notely.R
 import com.mertrizakaradeniz.notely.data.model.Priority
 import com.mertrizakaradeniz.notely.data.model.ToDo
@@ -45,6 +47,7 @@ class ToDoListAdapter : RecyclerView.Adapter<ToDoListAdapter.ViewHolder>() {
         holder.binding.apply {
             tvTitle.text = currentToDo.title
             tvDescription.text = currentToDo.description
+            imgData.load(currentToDo.imageUrl)
 
             when (currentToDo.priority) {
                 Priority.HIGH -> {
@@ -57,6 +60,7 @@ class ToDoListAdapter : RecyclerView.Adapter<ToDoListAdapter.ViewHolder>() {
                     priorityIndicator.setCardBackgroundColor(priorityIndicator.context.getColor(R.color.green))
                 }
             }
+
             root.setOnClickListener {
                 onItemClickListener?.let { it(currentToDo) }
             }
