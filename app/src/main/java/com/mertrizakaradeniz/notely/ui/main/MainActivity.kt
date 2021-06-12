@@ -7,7 +7,6 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.ListFragment
+                R.id.listFragment
             )
         )
 

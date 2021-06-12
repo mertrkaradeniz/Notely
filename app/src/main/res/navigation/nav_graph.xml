@@ -6,7 +6,7 @@
     app:startDestination="@id/signInFragment">
 
     <fragment
-        android:id="@+id/ListFragment"
+        android:id="@+id/listFragment"
         android:name="com.mertrizakaradeniz.notely.ui.list.ListFragment"
         android:label="To Do"
         tools:layout="@layout/fragment_list" >
@@ -35,7 +35,7 @@
         tools:layout="@layout/fragment_add" >
         <action
             android:id="@+id/action_addFragment_to_ListFragment"
-            app:destination="@id/ListFragment"
+            app:destination="@id/listFragment"
             app:enterAnim="@anim/from_left"
             app:exitAnim="@anim/to_right" />
     </fragment>
@@ -46,7 +46,7 @@
         tools:layout="@layout/fragment_update" >
         <action
             android:id="@+id/action_updateFragment_to_ListFragment"
-            app:destination="@id/ListFragment"
+            app:destination="@id/listFragment"
             app:enterAnim="@anim/from_right"
             app:exitAnim="@anim/to_left" />
         <argument
@@ -63,7 +63,7 @@
             app:destination="@id/signUpFragment" />
         <action
             android:id="@+id/action_signInFragment_to_ListFragment"
-            app:destination="@id/ListFragment" />
+            app:destination="@id/listFragment" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"

@@ -1,9 +1,11 @@
 package com.mertrizakaradeniz.notely.ui.add
 
 import android.app.Activity
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -20,6 +22,7 @@ import com.mertrizakaradeniz.notely.ui.main.MainActivity
 import com.mertrizakaradeniz.notely.util.Constant.REQUEST_CODE_IMAGE_PICK
 import com.mertrizakaradeniz.notely.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
 @AndroidEntryPoint
 class AddFragment : Fragment(R.layout.fragment_add) {
@@ -31,9 +34,11 @@ class AddFragment : Fragment(R.layout.fragment_add) {
     private val sharedViewModel: SharedViewModel by viewModels()
     private val firebaseViewModel: FirebaseViewModel by viewModels()
 
+    private lateinit var toDo: ToDo
     private lateinit var imageUrl: String
-
+    private val calendar: Calendar = Calendar.getInstance()
     private var currentFile: Uri? = null
+    private var isAlarmSet = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,8 +71,25 @@ class AddFragment : Fragment(R.layout.fragment_add) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_add -> insertToDo()
+            R.id.menu_reminder -> setReminder()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun setReminder() {
+        toDoViewModel.cancelNotification()
+        val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
+            calendar.set(Calendar.HOUR_OF_DAY, hour)
+            calendar.set(Calendar.MINUTE, minute)
+        }
+        TimePickerDialog(
+            requireContext(),
+            timeSetListener,
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            true
+        ).show()
+        isAlarmSet = true
     }
 
     private fun insertToDo() {
@@ -82,15 +104,14 @@ class AddFragment : Fragment(R.layout.fragment_add) {
                 } else {
                     imageUrl = ""
                 }
-                toDoViewModel.insertData(
-                    ToDo(
-                        0,
-                        title,
-                        sharedViewModel.parsePriority(priority),
-                        description,
-                        imageUrl
-                    )
+                toDo = ToDo(
+                    0,
+                    title,
+                    sharedViewModel.parsePriority(priority),
+                    description,
+                    imageUrl
                 )
+                toDoViewModel.insertData(toDo)
                 Toast.makeText(
                     requireContext(),
                     "Successfully added!",
@@ -103,6 +124,9 @@ class AddFragment : Fragment(R.layout.fragment_add) {
                     "Please fill out all fields.",
                     Toast.LENGTH_SHORT
                 ).show()
+            }
+            if (isAlarmSet) {
+                toDoViewModel.setupNotification(calendar, toDo)
             }
         }
     }

@@ -7,4 +7,8 @@ object Constant {
     const val USER_EMAIL: String = "UserEmail"
     const val UPLOADED_FILES = "Uploaded_files"
     const val REQUEST_CODE_IMAGE_PICK = 100
+    const val NOTIFICATION_ID: Int = 0
+    const val REQUEST_CODE: Int = 1
+    const val NOTIFICATION_BUNDLE = "ToDo"
+    const val BUNDLE = "bundle"
 }

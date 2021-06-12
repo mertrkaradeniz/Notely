@@ -29,4 +29,7 @@
     <string name="don_t_have_an_account_sign_up_now">Do not have an account? Sign up now.</string>
     <string name="image">image</string>
     <string name="sign_in_to_keep">Sign in to keep</string>
+
+    <string name="note_notification_channel_id" translatable="false">note_channel</string>
+    <string name="notification_title">Word Reminder</string>
 </resources>
