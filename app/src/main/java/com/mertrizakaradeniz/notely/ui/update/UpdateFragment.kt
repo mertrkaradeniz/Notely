@@ -50,9 +50,9 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
         toDo = arguments?.get(getString(R.string.todo)) as ToDo
         Log.d("SAAS", toDo.toString())
         setHasOptionsMenu(true)
-        /*populateUI()
+        populateUI()
         handleClickEvent()
-        binding.spCurrentPriorities.onItemSelectedListener = sharedViewModel.listener*/
+        binding.spCurrentPriorities.onItemSelectedListener = sharedViewModel.listener
     }
 
     private fun handleClickEvent() {
