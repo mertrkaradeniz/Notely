@@ -9,26 +9,11 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="lightGray">#E6E6E6</color>
-    <color name="darkGray">#4B4B4B</color>
-    <color name="dark_red">#8b0000</color>
-    <color name="dark_green">#006400</color>
-    <color name="blue_dark">#3B4FFE</color>
-    <color name="blue_light">#6283FF</color>
-    <color name="light_grey">#eeeeee</color>
-    <color name="light_blue">#00adb5</color>
-    <color name="grey">#393e46</color>
-    <color name="dark_grey">#222831</color>
-    <color name="yellow">#FFEB3B</color>
-    <color name="dark_yellow">#8B8000</color>
+    <color name="yellow">#FFC114</color>
 
-    <color name="google_darker_grey">#202125</color>
-    <color name="google_dark_grey">#2d2e32</color>
-    <color name="google_light_grey">#d9dade</color>
-    <color name="google_medium_grey">#48484a</color>
-    <color name="google_grey">#94949c</color>
-    <color name="google_title_grey">#f6f7f8</color>
-    <color name="google_hint_grey">#abacb0</color>
-
+    <color name="dark_red">#FF0000</color>
+    <color name="dark_green">#00FF00</color>
+    <color name="dark_yellow">#FFFF00</color>
 
     <color name="colorPrimary">#292929</color>
     <color name="colorPrimaryDark">#292929</color>

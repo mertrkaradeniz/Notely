@@ -65,26 +65,12 @@
                 android:textSize="@dimen/_16sdp"
                 app:layout_constraintTop_toBottomOf="@id/imgBack" />
 
-            <TextView
-                android:id="@+id/tvDateTime"
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/ubuntu_regular"
-                android:includeFontPadding="false"
-                android:textColor="@color/colorIcons"
-                android:textSize="@dimen/_10sdp"
-                app:layout_constraintEnd_toEndOf="@id/etNoteTitle"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@id/etNoteTitle"
-                app:layout_constraintTop_toBottomOf="@+id/etNoteTitle" />
-
             <EditText
                 android:id="@+id/etNoteSubtitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:background="@null"
                 android:fontFamily="@font/ubuntu_medium"
@@ -99,7 +85,7 @@
                 android:textSize="@dimen/_13sdp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/viewSubtitleIndicator"
-                app:layout_constraintTop_toBottomOf="@id/tvDateTime" />
+                app:layout_constraintTop_toBottomOf="@id/etNoteTitle" />
 
             <View
                 android:id="@+id/viewSubtitleIndicator"
@@ -116,7 +102,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/image"
@@ -141,9 +127,9 @@
             <LinearLayout
                 android:id="@+id/llWebURL"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_50sdp"
+                android:layout_height="@dimen/_30sdp"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -174,14 +160,14 @@
                 android:id="@+id/spPriorities"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/google_hint_grey"
-                android:entries="@array/priorities"
+                android:layout_margin="@dimen/_8sdp"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:layout_marginBottom="@dimen/_15sdp"
-                android:layout_margin="@dimen/_8sdp"
-                android:textColorHint="@color/google_hint_grey"
+                android:backgroundTint="@color/colorTextHint"
+                android:entries="@array/priorities"
+                android:textColorHint="@color/colorTextHint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
@@ -192,7 +178,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:layout_marginBottom="@dimen/_15sdp"
                 android:background="@null"
@@ -211,16 +197,28 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/tvDateTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/ubuntu_regular"
+        android:includeFontPadding="false"
+        android:layout_marginBottom="@dimen/_12sdp"
+        android:layout_gravity="center|bottom"
+        android:textColor="@color/colorIcons"
+        android:textSize="@dimen/_10sdp" />
+
     <ImageView
         android:id="@+id/imageButton"
-        android:layout_width="@dimen/_20sdp"
-        android:layout_height="@dimen/_20sdp"
-        android:layout_marginEnd="@dimen/_8sdp"
-        android:layout_marginBottom="@dimen/_8sdp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginEnd="@dimen/_6sdp"
+        android:layout_marginBottom="@dimen/_4sdp"
         android:contentDescription="@string/image"
         android:padding="@dimen/_4sdp"
         android:src="@drawable/ic_more"
-        android:layout_gravity="bottom|right"
         app:tint="@color/colorIcons"
         tools:ignore="RtlHardcoded" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

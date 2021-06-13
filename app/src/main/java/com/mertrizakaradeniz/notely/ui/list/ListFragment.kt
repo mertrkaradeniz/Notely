@@ -5,10 +5,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
-import android.widget.GridLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,13 +24,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 
 @AndroidEntryPoint
-class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextListener {
+class ListFragment : Fragment(R.layout.fragment_list) {
 
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
 
     private val toDoViewModel: ToDoViewModel by viewModels()
     private val toDoListAdapter: ToDoListAdapter by lazy { ToDoListAdapter() }
+
+    private var sortByHighPriority = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -80,34 +80,6 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
             viewLifecycleOwner,
             onBackPressedCallBack
         )
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_priority_high -> toDoViewModel.sortByHighPriority.observe(
-                viewLifecycleOwner, {
-                    toDoListAdapter.toDoList = it
-                })
-            R.id.menu_priority_low -> toDoViewModel.sortByLowPriority.observe(
-                viewLifecycleOwner, {
-                    toDoListAdapter.toDoList = it
-                })
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        if (query != null) {
-            searchThroughDatabase(query)
-        }
-        return true
-    }
-
-    override fun onQueryTextChange(query: String?): Boolean {
-        if (query != null) {
-            searchThroughDatabase(query)
-        }
-        return true
     }
 
     override fun onDestroy() {
@@ -180,20 +152,41 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
                 confirmRemoval()
             }
             imgLayout.setOnClickListener {
-                when (rvNotes.layoutManager) {
-                    is LinearLayoutManager -> {
-                        imgLayout.setImageResource(R.drawable.ic_layout_grid)
-                        rvNotes.layoutManager =
-                            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-                    }
-                    is StaggeredGridLayoutManager -> {
-                        imgLayout.setImageResource(R.drawable.ic_layout_linear)
-                        rvNotes.layoutManager = LinearLayoutManager(requireContext())
+                handleLayoutManager()
+            }
+            imgSort.setOnClickListener {
+                handleSorting()
+            }
+        }
+    }
 
-                    }
+    private fun handleLayoutManager() {
+        binding.apply {
+            when (rvNotes.layoutManager) {
+                is LinearLayoutManager -> {
+                    imgLayout.setImageResource(R.drawable.ic_layout_linear)
+                    rvNotes.layoutManager =
+                        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                }
+                is StaggeredGridLayoutManager -> {
+                    imgLayout.setImageResource(R.drawable.ic_layout_grid)
+                    rvNotes.layoutManager = LinearLayoutManager(requireContext())
                 }
             }
         }
+    }
+
+    private fun handleSorting() {
+        if (sortByHighPriority) {
+            toDoViewModel.sortByHighPriority.observe(viewLifecycleOwner, {
+                toDoListAdapter.toDoList = it
+            })
+        } else {
+            toDoViewModel.sortByLowPriority.observe(viewLifecycleOwner, {
+                toDoListAdapter.toDoList = it
+            })
+        }
+        sortByHighPriority = !sortByHighPriority
     }
 
     private fun setupRecyclerView() {
@@ -251,7 +244,6 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
     }
 
     private fun confirmRemoval() {
-
         val builder = AlertDialog.Builder(requireContext())
         builder.setPositiveButton("Yes") { _, _ ->
             toDoViewModel.deleteAll()

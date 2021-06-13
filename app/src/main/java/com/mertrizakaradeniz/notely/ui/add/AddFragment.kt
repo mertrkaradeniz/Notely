@@ -1,6 +1,7 @@
 package com.mertrizakaradeniz.notely.ui.add
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.TimePickerDialog
@@ -26,7 +27,6 @@ import com.mertrizakaradeniz.notely.databinding.LayoutAddUrlBinding
 import com.mertrizakaradeniz.notely.databinding.LayoutBottomSheetBinding
 import com.mertrizakaradeniz.notely.databinding.LayoutDeleteNoteBinding
 import com.mertrizakaradeniz.notely.ui.FirebaseViewModel
-import com.mertrizakaradeniz.notely.ui.list.ToDoViewModel
 import com.mertrizakaradeniz.notely.ui.main.MainActivity
 import com.mertrizakaradeniz.notely.util.Constant.PERMISSION_EXTERNAL_STORAGE_REQUEST_CODE
 import com.mertrizakaradeniz.notely.util.Constant.REQUEST_CODE_IMAGE_PICK
@@ -193,18 +193,6 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.add_fragment_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_add -> insertToDo()
-            R.id.menu_reminder -> setReminder()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun setReminder() {
         toDoAddViewModel.cancelNotification()
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
@@ -310,6 +298,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         })
     }
 
+    @SuppressLint("InflateParams")
     private fun initBottomSheet() {
         val bottomSheet = layoutInflater.inflate(R.layout.layout_bottom_sheet, null)
         _bottomSheetBinding = LayoutBottomSheetBinding.inflate(
@@ -320,6 +309,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         dialog.setContentView(bottomSheetBinding.root)
     }
 
+    @SuppressLint("InflateParams")
     private fun initURLDialog() {
         val urlDialog = layoutInflater.inflate(R.layout.layout_add_url, null)
         _urlDialogBinding = LayoutAddUrlBinding.inflate(
@@ -329,6 +319,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         )
     }
 
+    @SuppressLint("InflateParams")
     private fun initDeleteNoteDialog() {
         val deleteDialog = layoutInflater.inflate(R.layout.layout_delete_note, null)
         _deleteNoteDialogBinding = LayoutDeleteNoteBinding.inflate(
