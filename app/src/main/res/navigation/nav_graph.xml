@@ -18,13 +18,6 @@
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right" />
         <action
-            android:id="@+id/action_ListFragment_to_updateFragment"
-            app:destination="@id/updateFragment"
-            app:enterAnim="@anim/from_left"
-            app:exitAnim="@anim/to_right"
-            app:popEnterAnim="@anim/from_right"
-            app:popExitAnim="@anim/to_left" />
-        <action
             android:id="@+id/action_ListFragment_to_signInFragment"
             app:destination="@id/signInFragment" />
     </fragment>
@@ -43,22 +36,8 @@
             app:argType="com.mertrizakaradeniz.notely.data.model.ToDo" />
     </fragment>
     <fragment
-        android:id="@+id/updateFragment"
-        android:name="com.mertrizakaradeniz.notely.ui.update.UpdateFragment"
-        android:label=""
-        tools:layout="@layout/fragment_update" >
-        <action
-            android:id="@+id/action_updateFragment_to_ListFragment"
-            app:destination="@id/listFragment"
-            app:enterAnim="@anim/from_right"
-            app:exitAnim="@anim/to_left" />
-        <argument
-            android:name="currentToDo"
-            app:argType="com.mertrizakaradeniz.notely.data.model.ToDo" />
-    </fragment>
-    <fragment
         android:id="@+id/signInFragment"
-        android:name="com.mertrizakaradeniz.notely.ui.signin.SignInFragment"
+        android:name="com.mertrizakaradeniz.notely.ui.auth.SignInFragment"
         android:label=""
         tools:layout="@layout/fragment_sign_in" >
         <action
@@ -70,7 +49,7 @@
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.mertrizakaradeniz.notely.ui.signup.SignUpFragment"
+        android:name="com.mertrizakaradeniz.notely.ui.auth.SignUpFragment"
         android:label=""
         tools:layout="@layout/fragment_sign_up" />
 </navigation>

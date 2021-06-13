@@ -7,7 +7,7 @@
     android:layout_margin="32dp"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".ui.signup.SignUpFragment">
+    tools:context=".ui.auth.SignUpFragment">
 
     <TextView
         android:id="@+id/tvTitle"

@@ -12,12 +12,8 @@ class ToDoRepository @Inject constructor(
     val sortByHighPriority: LiveData<List<ToDo>> = toDoDao.sortByHighPriority()
     val sortByLowPriority: LiveData<List<ToDo>> = toDoDao.sortByLowPriority()
 
-    suspend fun insertData(toDoData: ToDo) {
-        toDoDao.insertData(toDoData)
-    }
-
-    suspend fun updateData(toDoData: ToDo) {
-        toDoDao.updateData(toDoData)
+    suspend fun upsertNote(toDoData: ToDo) {
+        toDoDao.upsertNote(toDoData)
     }
 
     suspend fun deleteItem(toDoData: ToDo) {

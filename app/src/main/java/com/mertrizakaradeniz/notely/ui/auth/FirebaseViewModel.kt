@@ -1,4 +1,4 @@
-package com.mertrizakaradeniz.notely.ui
+package com.mertrizakaradeniz.notely.ui.auth
 
 import android.content.SharedPreferences
 import android.net.Uri

@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -85,11 +84,6 @@ class ListFragment : Fragment(R.layout.fragment_list) {
             viewLifecycleOwner,
             onBackPressedCallBack
         )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     private fun setupObserver() {
@@ -227,7 +221,7 @@ class ListFragment : Fragment(R.layout.fragment_list) {
                 Snackbar.make(binding.root, "Note archived", Snackbar.LENGTH_LONG)
                     .apply {
                         setAction("Undo") {
-                            toDoViewModel.insertData(toDo)
+                            toDoViewModel.upsertNote(toDo)
                         }
                         setActionTextColor(ContextCompat.getColor(context, R.color.yellow))
                         show()
@@ -280,19 +274,9 @@ class ListFragment : Fragment(R.layout.fragment_list) {
         dialogDeleteAllNote?.show()
     }
 
-    private fun confirmRemoval() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setPositiveButton("Yes") { _, _ ->
-            toDoViewModel.deleteAll()
-            Toast.makeText(
-                requireContext(),
-                "Successfully Removed everything!",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-        builder.setNegativeButton("No") { _, _ -> }
-        builder.setTitle("Delete everything?")
-        builder.setMessage("Are you sure you want to remove everything?")
-        builder.create().show()
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+        _deleteAllNoteDialogBinding = null
     }
 }

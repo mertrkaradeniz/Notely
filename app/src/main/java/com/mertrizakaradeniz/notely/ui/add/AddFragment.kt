@@ -1,7 +1,6 @@
 package com.mertrizakaradeniz.notely.ui.add
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.TimePickerDialog
@@ -28,7 +27,7 @@ import com.mertrizakaradeniz.notely.databinding.FragmentAddBinding
 import com.mertrizakaradeniz.notely.databinding.LayoutAddUrlBinding
 import com.mertrizakaradeniz.notely.databinding.LayoutBottomSheetBinding
 import com.mertrizakaradeniz.notely.databinding.LayoutDeleteNoteBinding
-import com.mertrizakaradeniz.notely.ui.FirebaseViewModel
+import com.mertrizakaradeniz.notely.ui.auth.FirebaseViewModel
 import com.mertrizakaradeniz.notely.ui.main.MainActivity
 import com.mertrizakaradeniz.notely.util.Constant.PERMISSION_EXTERNAL_STORAGE_REQUEST_CODE
 import com.mertrizakaradeniz.notely.util.Constant.REQUEST_CODE_IMAGE_PICK
@@ -246,7 +245,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
                 if (binding.llWebURL.visibility == View.VISIBLE) {
                     newToDo.webLink = tvWebURL.text.toString()
                 }
-                toDoAddViewModel.insertData(newToDo)
+                toDoAddViewModel.upsertNote(newToDo)
                 Toast.makeText(
                     requireContext(),
                     "Successfully added!",
@@ -285,14 +284,14 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         firebaseViewModel.fileUploadResult.observe(viewLifecycleOwner, { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    (requireActivity() as MainActivity).hideProgressBar()
+                    (requireActivity() as MainActivity).progressBarVisibility()
                     firebaseViewModel.filePath.observe(viewLifecycleOwner, { url ->
                         selectedImageUrl = url
                     })
                 }
                 is Resource.Error -> {
                     selectedImageUrl = ""
-                    (requireActivity() as MainActivity).hideProgressBar()
+                    (requireActivity() as MainActivity).progressBarVisibility()
                     Toast.makeText(
                         requireContext(),
                         "Image uploading is failed",
@@ -300,7 +299,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
                     ).show()
                 }
                 is Resource.Loading -> {
-                    (requireActivity() as MainActivity).showProgressBar()
+                    (requireActivity() as MainActivity).progressBarVisibility()
                 }
             }
         })

@@ -9,9 +9,6 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import coil.transform.CircleCropTransformation
-import coil.transform.RoundedCornersTransformation
-import com.google.android.material.shape.CornerFamily
 import com.mertrizakaradeniz.notely.R
 import com.mertrizakaradeniz.notely.data.model.Priority
 import com.mertrizakaradeniz.notely.data.model.ToDo
@@ -59,7 +56,6 @@ class ToDoListAdapter : RecyclerView.Adapter<ToDoListAdapter.ViewHolder>() {
             tvDateTime.text = currentToDo.dateTime
             val gradientDrawable = llNote.background as GradientDrawable
             gradientDrawable.setColor(Color.parseColor(currentToDo.color))
-            //tvDescription.text = currentToDo.noteText
 
             if (currentToDo.imageUrl != null) {
                 imgNote.visibility = View.VISIBLE

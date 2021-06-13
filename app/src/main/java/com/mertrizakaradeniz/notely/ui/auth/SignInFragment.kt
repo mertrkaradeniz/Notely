@@ -1,7 +1,6 @@
-package com.mertrizakaradeniz.notely.ui.signin
+package com.mertrizakaradeniz.notely.ui.auth
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.mertrizakaradeniz.notely.R
 import com.mertrizakaradeniz.notely.databinding.FragmentSignInBinding
-import com.mertrizakaradeniz.notely.ui.FirebaseViewModel
 import com.mertrizakaradeniz.notely.ui.main.MainActivity
 import com.mertrizakaradeniz.notely.util.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,19 +67,18 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     }
 
     private fun setupObservers() {
-
         firebaseViewModel.signInResult.observe(viewLifecycleOwner) { resource ->
             when(resource) {
                 is Resource.Success -> {
-                    (requireActivity() as MainActivity).hideProgressBar()
+                    (requireActivity() as MainActivity).progressBarVisibility()
                     findNavController().navigate(SignInFragmentDirections.actionSignInFragmentToListFragment())
                 }
                 is Resource.Error -> {
-                    (requireActivity() as MainActivity).hideProgressBar()
+                    (requireActivity() as MainActivity).progressBarVisibility()
                     Toast.makeText(requireContext(), "Sign in is failed", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
-                    (requireActivity() as MainActivity).showProgressBar()
+                    (requireActivity() as MainActivity).progressBarVisibility()
                 }
             }
         }

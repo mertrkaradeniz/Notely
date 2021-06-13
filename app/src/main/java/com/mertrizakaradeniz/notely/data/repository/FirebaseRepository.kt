@@ -48,13 +48,4 @@ class FirebaseRepository @Inject constructor(
                 onResult(Resource.Error(exception.localizedMessage ?: ""))
             }
     }
-
-    /*fun download(fileUri: Uri, onResult: (Resource<Uri>) -> Unit) {
-        onResult(Resource.Loading())
-        getFirebaseStorage().child(fileUri.lastPathSegment.toString()).downloadUrl.addOnSuccessListener { Uri ->
-            onResult(Resource.Success(Uri))
-        }.addOnFailureListener { exception ->
-            onResult(Resource.Error(exception.localizedMessage ?: ""))
-        }
-    }*/
 }

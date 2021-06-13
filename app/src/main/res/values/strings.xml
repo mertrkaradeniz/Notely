@@ -14,11 +14,13 @@
     <string name="todo">ToDo</string>
     <string name="archive">archive</string>
     <string name="notification">notification</string>
+
     <string-array name="priorities">
         <item>High Priority</item>
         <item>Medium Priority</item>
         <item>Low Priority</item>
     </string-array>
+
     <string name="sign_up_to_keep">Sign up to keep</string>
     <string name="notes">Notes</string>
     <string name="email_address">Email Address</string>

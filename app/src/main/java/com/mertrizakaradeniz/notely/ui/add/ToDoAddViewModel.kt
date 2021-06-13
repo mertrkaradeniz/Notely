@@ -27,21 +27,22 @@ import javax.inject.Inject
 @HiltViewModel
 class ToDoAddViewModel @Inject constructor(
     private val repository: ToDoRepository,
-    application: Application) : AndroidViewModel(application) {
+    application: Application
+) : AndroidViewModel(application) {
 
     private val app = application
     private val alarmManager: AlarmManager =
         application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
+    private var notifyPendingIntent: PendingIntent? = null
+
     fun setupNotification(calender: Calendar, toDo: ToDo) {
         val notificationIntent = Intent(app, AlarmReceiver::class.java)
-//        notificationIntent.putExtra(NOTIFICATION_TITLE, title)
-//        notificationIntent.putExtra(NOTIFICATION_MESSAGE, message)
         val bundle = Bundle().apply {
             putParcelable(Constant.NOTIFICATION_BUNDLE, toDo)
         }
         notificationIntent.putExtra(Constant.BUNDLE, bundle)
-        val notifyPendingIntent: PendingIntent = PendingIntent.getBroadcast(
+        notifyPendingIntent = PendingIntent.getBroadcast(
             app,
             Constant.REQUEST_CODE,
             notificationIntent,
@@ -52,39 +53,16 @@ class ToDoAddViewModel @Inject constructor(
             calender.timeInMillis,
             notifyPendingIntent
         )
-
-//        alarmManager.setInexactRepeating(
-//            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//            SystemClock.elapsedRealtime() + 1000 * 30,
-//            1000 * 30,
-//            notifyPendingIntent
-//        )
-
-//        alarmManager.setInexactRepeating(
-//            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-//            SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_HALF_DAY,
-//            AlarmManager.INTERVAL_HALF_DAY,
-//            notifyPendingIntent
-//        )
-
-//        val calendar: Calendar = Calendar.getInstance().apply {
-//            timeInMillis = System.currentTimeMillis()
-//            set(Calendar.HOUR_OF_DAY, 14)
-//        }
-//        alarmManager.setInexactRepeating(
-//            AlarmManager.RTC_WAKEUP,
-//            calendar.timeInMillis,
-//            AlarmManager.RTC_WAKEUP,
-//            notifyPendingIntent
-//        )
     }
 
     fun cancelNotification() {
-        //alarmManager.cancel(notifyPendingIntent)
+        if (notifyPendingIntent != null) {
+            alarmManager.cancel(notifyPendingIntent)
+        }
     }
 
-    fun insertData(toDo: ToDo) = viewModelScope.launch {
-        repository.insertData(toDo)
+    fun upsertNote(toDo: ToDo) = viewModelScope.launch {
+        repository.upsertNote(toDo)
     }
 
     fun deleteItem(toDo: ToDo) = viewModelScope.launch(Dispatchers.IO) {
