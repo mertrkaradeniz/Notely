@@ -12,7 +12,9 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Patterns
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,6 +39,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 @AndroidEntryPoint
 class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionCallbacks {
 
@@ -52,16 +55,19 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
     private val toDoAddViewModel: ToDoAddViewModel by viewModels()
     private val firebaseViewModel: FirebaseViewModel by viewModels()
 
-    private lateinit var toDo: ToDo
     private var dialogAddURL: AlertDialog? = null
     private var dialogDeleteNote: AlertDialog? = null
+    private lateinit var dialog: BottomSheetDialog
+
+    private lateinit var toDo: ToDo
     private lateinit var selectedImageUrl: String
     private var selectedColor: String = "#333333"
-    private val calendar: Calendar = Calendar.getInstance()
     private var currentFile: Uri? = null
+
+    private val calendar: Calendar = Calendar.getInstance()
     private var isAlarmSet = false
-    private lateinit var dialog: BottomSheetDialog
-    private var flag = false
+
+    private var flagDelete = false
     private lateinit var action: String
 
     override fun onCreateView(
@@ -74,7 +80,18 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        handleArguments()
         dialog = BottomSheetDialog((requireContext()))
+        setSubtitleIndicatorColor()
+        handleActionRequest()
+        initBottomSheet()
+        setDateTime()
+        handleClickEvent()
+        binding.spPriorities.onItemSelectedListener = toDoAddViewModel.listener
+        bottomSheetHandleClickEvent(dialog)
+    }
+
+    private fun handleArguments() {
         action = if (arguments?.get(requireActivity().getString(R.string.action)) != null) {
             arguments?.get(requireActivity().getString(R.string.action)) as String
         } else {
@@ -82,30 +99,21 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         }
         if (arguments?.get(getString(R.string.todo)) != null) {
             toDo = arguments?.get(getString(R.string.todo)) as ToDo
-            flag = true
+            flagDelete = true
             populateUI()
         } else {
             initToDo()
-            flag = false
+            flagDelete = false
         }
-        handleActionRequest()
-        initBottomSheet()
-        setHasOptionsMenu(true)
-        setDateTime()
-        handleClickEvent()
-        binding.spPriorities.onItemSelectedListener = toDoAddViewModel.listener
-        setSubtitleIndicatorColor()
-        bottomSheetHandleClickEvent(dialog)
     }
 
     private fun handleActionRequest() {
         if (action.isNotBlank()) {
-            when(action) {
+            when (action) {
                 requireActivity().getString(R.string.image) -> {
                     requestStoragePermission()
                 }
                 requireActivity().getString(R.string.url) -> {
-                    initURLDialog()
                     showAddURLDialog()
                 }
             }
@@ -298,9 +306,8 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         })
     }
 
-    @SuppressLint("InflateParams")
     private fun initBottomSheet() {
-        val bottomSheet = layoutInflater.inflate(R.layout.layout_bottom_sheet, null)
+        val bottomSheet = layoutInflater.inflate(R.layout.layout_bottom_sheet, null as ViewGroup?)
         _bottomSheetBinding = LayoutBottomSheetBinding.inflate(
             layoutInflater,
             bottomSheet as ViewGroup,
@@ -309,9 +316,8 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         dialog.setContentView(bottomSheetBinding.root)
     }
 
-    @SuppressLint("InflateParams")
     private fun initURLDialog() {
-        val urlDialog = layoutInflater.inflate(R.layout.layout_add_url, null)
+        val urlDialog = layoutInflater.inflate(R.layout.layout_add_url, null as ViewGroup?)
         _urlDialogBinding = LayoutAddUrlBinding.inflate(
             layoutInflater,
             urlDialog as ViewGroup,
@@ -319,9 +325,8 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         )
     }
 
-    @SuppressLint("InflateParams")
     private fun initDeleteNoteDialog() {
-        val deleteDialog = layoutInflater.inflate(R.layout.layout_delete_note, null)
+        val deleteDialog = layoutInflater.inflate(R.layout.layout_delete_note, null as ViewGroup?)
         _deleteNoteDialogBinding = LayoutDeleteNoteBinding.inflate(
             layoutInflater,
             deleteDialog as ViewGroup,
@@ -333,46 +338,31 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         bottomSheetBinding.apply {
             viewColor1.setOnClickListener {
                 selectedColor = "#333333"
+                initializeImageColor()
                 imageColor1.setImageResource(R.drawable.ic_done)
-                imageColor2.setImageResource(0)
-                imageColor3.setImageResource(0)
-                imageColor4.setImageResource(0)
-                imageColor5.setImageResource(0)
                 setSubtitleIndicatorColor()
             }
             viewColor2.setOnClickListener {
                 selectedColor = "#FDBE3B"
-                imageColor1.setImageResource(0)
+                initializeImageColor()
                 imageColor2.setImageResource(R.drawable.ic_done)
-                imageColor3.setImageResource(0)
-                imageColor4.setImageResource(0)
-                imageColor5.setImageResource(0)
                 setSubtitleIndicatorColor()
             }
             viewColor3.setOnClickListener {
                 selectedColor = "#FF4B42"
-                imageColor1.setImageResource(0)
-                imageColor2.setImageResource(0)
+                initializeImageColor()
                 imageColor3.setImageResource(R.drawable.ic_done)
-                imageColor4.setImageResource(0)
-                imageColor5.setImageResource(0)
                 setSubtitleIndicatorColor()
             }
             viewColor4.setOnClickListener {
                 selectedColor = "#3A52FC"
-                imageColor1.setImageResource(0)
-                imageColor2.setImageResource(0)
-                imageColor3.setImageResource(0)
+                initializeImageColor()
                 imageColor4.setImageResource(R.drawable.ic_done)
-                imageColor5.setImageResource(0)
                 setSubtitleIndicatorColor()
             }
             viewColor5.setOnClickListener {
                 selectedColor = "#000000"
-                imageColor1.setImageResource(0)
-                imageColor2.setImageResource(0)
-                imageColor3.setImageResource(0)
-                imageColor4.setImageResource(0)
+                initializeImageColor()
                 imageColor5.setImageResource(R.drawable.ic_done)
                 setSubtitleIndicatorColor()
             }
@@ -394,15 +384,13 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
             }
             llAddUrl.setOnClickListener {
                 dialog.dismiss()
-                initURLDialog()
                 showAddURLDialog()
             }
 
-            if (flag) {
+            if (flagDelete) {
                 llDeleteNote.visibility = View.VISIBLE
                 llDeleteNote.setOnClickListener {
                     dialog.dismiss()
-                    initDeleteNoteDialog()
                     showDeleteDialog()
                 }
             }
@@ -414,12 +402,23 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         }
     }
 
+    private fun initializeImageColor() {
+        bottomSheetBinding.apply {
+            imageColor1.setImageResource(0)
+            imageColor2.setImageResource(0)
+            imageColor3.setImageResource(0)
+            imageColor4.setImageResource(0)
+            imageColor5.setImageResource(0)
+        }
+    }
+
     private fun setSubtitleIndicatorColor() {
         val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
         gradientDrawable.setColor(Color.parseColor(selectedColor))
     }
 
     private fun showDeleteDialog() {
+        initDeleteNoteDialog()
         if (dialogDeleteNote == null) {
             AlertDialog.Builder(requireContext()).apply {
                 setView(deleteNoteDialogBinding.root)
@@ -443,16 +442,15 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
     }
 
     private fun showAddURLDialog() {
+        initURLDialog()
         if (dialogDeleteNote == null) {
             AlertDialog.Builder(requireContext()).apply {
                 setView(urlDialogBinding.root)
                 dialogAddURL = create()
             }
-
             if (dialogAddURL?.window != null) {
                 dialogAddURL?.window?.setBackgroundDrawable(ColorDrawable(0))
             }
-
             urlDialogBinding.apply {
                 etUrl.requestFocus()
                 tvAdd.setOnClickListener {

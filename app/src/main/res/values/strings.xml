@@ -7,7 +7,7 @@
     <string name="sort_by">sort_by</string>
     <string name="priority_high">priority_high</string>
     <string name="priority_low">priority_low</string>
-    <string name="delete_all">delete_All</string>
+    <string name="delete_all">delete All</string>
     <string name="add">add</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
@@ -47,5 +47,6 @@
     <string name="set_reminder">Set Reminder</string>
     <string name="action">action</string>
     <string name="url">url</string>
+    <string name="are_you_sure_you_want_to_remove_everything">Are you sure you want to remove everything?</string>
 
 </resources>

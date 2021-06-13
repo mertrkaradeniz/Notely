@@ -204,7 +204,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/ubuntu_regular"
         android:includeFontPadding="false"
-        android:layout_marginBottom="@dimen/_12sdp"
+        android:layout_marginBottom="@dimen/_11sdp"
         android:layout_gravity="center|bottom"
         android:textColor="@color/colorIcons"
         android:textSize="@dimen/_10sdp" />

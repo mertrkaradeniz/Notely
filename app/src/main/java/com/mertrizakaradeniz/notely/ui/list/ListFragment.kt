@@ -1,6 +1,7 @@
 package com.mertrizakaradeniz.notely.ui.list
 
 import android.app.AlertDialog
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -19,6 +20,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.mertrizakaradeniz.notely.R
 import com.mertrizakaradeniz.notely.adapter.ToDoListAdapter
 import com.mertrizakaradeniz.notely.databinding.FragmentListBinding
+import com.mertrizakaradeniz.notely.databinding.LayoutDeleteAllBinding
 import com.mertrizakaradeniz.notely.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
@@ -28,10 +30,13 @@ class ListFragment : Fragment(R.layout.fragment_list) {
 
     private var _binding: FragmentListBinding? = null
     private val binding get() = _binding!!
+    private var _deleteAllNoteDialogBinding: LayoutDeleteAllBinding? = null
+    private val deleteAllNoteDialogBinding get() = _deleteAllNoteDialogBinding!!
 
     private val toDoViewModel: ToDoViewModel by viewModels()
     private val toDoListAdapter: ToDoListAdapter by lazy { ToDoListAdapter() }
 
+    private var dialogDeleteAllNote: AlertDialog? = null
     private var sortByHighPriority = true
 
     override fun onCreateView(
@@ -149,7 +154,7 @@ class ListFragment : Fragment(R.layout.fragment_list) {
                 findNavController().navigate(R.id.action_ListFragment_to_addFragment, bundle)
             }
             imgDeleteAll.setOnClickListener {
-                confirmRemoval()
+                showDeleteAllDialog()
             }
             imgLayout.setOnClickListener {
                 handleLayoutManager()
@@ -241,6 +246,38 @@ class ListFragment : Fragment(R.layout.fragment_list) {
                 toDoListAdapter.toDoList = list
             }
         })
+    }
+
+    private fun initDeleteAllNoteDialog() {
+        val deleteDialog = layoutInflater.inflate(R.layout.layout_delete_all, null as ViewGroup?)
+        _deleteAllNoteDialogBinding = LayoutDeleteAllBinding.inflate(
+            layoutInflater,
+            deleteDialog as ViewGroup,
+            false
+        )
+    }
+
+    private fun showDeleteAllDialog() {
+        initDeleteAllNoteDialog()
+        if (dialogDeleteAllNote == null) {
+            AlertDialog.Builder(requireContext()).apply {
+                setView(deleteAllNoteDialogBinding.root)
+                dialogDeleteAllNote = create()
+            }
+            if (dialogDeleteAllNote?.window != null) {
+                dialogDeleteAllNote?.window?.setBackgroundDrawable(ColorDrawable(0))
+            }
+            deleteAllNoteDialogBinding.apply {
+                tvDeleteNote.setOnClickListener {
+                    toDoViewModel.deleteAll()
+                    dialogDeleteAllNote?.dismiss()
+                }
+                tvCancel.setOnClickListener {
+                    dialogDeleteAllNote?.dismiss()
+                }
+            }
+        }
+        dialogDeleteAllNote?.show()
     }
 
     private fun confirmRemoval() {
