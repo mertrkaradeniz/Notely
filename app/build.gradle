@@ -86,4 +86,9 @@ dependencies {
 
     // RecyclerView Animator
     implementation 'jp.wasabeef:recyclerview-animators:4.0.2'
+
+    //Scalable Size Unit(support for different screen sizes)
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
+
+    implementation 'com.makeramen:roundedimageview:2.3.0'
 }

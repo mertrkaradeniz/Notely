@@ -38,6 +38,9 @@
             app:destination="@id/listFragment"
             app:enterAnim="@anim/from_left"
             app:exitAnim="@anim/to_right" />
+        <argument
+            android:name="currentToDo"
+            app:argType="com.mertrizakaradeniz.notely.data.model.ToDo" />
     </fragment>
     <fragment
         android:id="@+id/updateFragment"

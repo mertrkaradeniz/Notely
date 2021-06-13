@@ -1,12 +1,17 @@
 package com.mertrizakaradeniz.notely.adapter
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import coil.transform.CircleCropTransformation
 import coil.transform.RoundedCornersTransformation
+import com.google.android.material.shape.CornerFamily
 import com.mertrizakaradeniz.notely.R
 import com.mertrizakaradeniz.notely.data.model.Priority
 import com.mertrizakaradeniz.notely.data.model.ToDo
@@ -46,18 +51,32 @@ class ToDoListAdapter : RecyclerView.Adapter<ToDoListAdapter.ViewHolder>() {
 
         holder.binding.apply {
             tvTitle.text = currentToDo.title
-            tvDescription.text = currentToDo.description
-            imgData.load(currentToDo.imageUrl)
+            if (currentToDo.subtitle.trim().isEmpty()) {
+                tvSubtitle.visibility = View.GONE
+            } else {
+                tvSubtitle.text = currentToDo.subtitle
+            }
+            tvDateTime.text = currentToDo.dateTime
+            val gradientDrawable = llNote.background as GradientDrawable
+            gradientDrawable.setColor(Color.parseColor(currentToDo.color))
+            //tvDescription.text = currentToDo.noteText
+
+            if (currentToDo.imageUrl != null) {
+                imgNote.visibility = View.VISIBLE
+                imgNote.load(currentToDo.imageUrl)
+            } else {
+                imgNote.visibility = View.GONE
+            }
 
             when (currentToDo.priority) {
                 Priority.HIGH -> {
-                    priorityIndicator.setCardBackgroundColor(priorityIndicator.context.getColor(R.color.red))
+                    priorityIndicator.setCardBackgroundColor(priorityIndicator.context.getColor(R.color.dark_red))
                 }
                 Priority.MEDIUM -> {
-                    priorityIndicator.setCardBackgroundColor(priorityIndicator.context.getColor(R.color.yellow))
+                    priorityIndicator.setCardBackgroundColor(priorityIndicator.context.getColor(R.color.dark_yellow))
                 }
                 Priority.LOW -> {
-                    priorityIndicator.setCardBackgroundColor(priorityIndicator.context.getColor(R.color.green))
+                    priorityIndicator.setCardBackgroundColor(priorityIndicator.context.getColor(R.color.dark_green))
                 }
             }
 

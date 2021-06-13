@@ -97,7 +97,7 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
     private fun populateUI() {
         binding.apply {
             etCurrentTitle.setText(toDo.title)
-            etCurrentDescription.setText(toDo.description)
+            etCurrentDescription.setText(toDo.noteText)
             imgCurrent.load(toDo.imageUrl)
             when(toDo.priority) {
                 Priority.HIGH -> {spCurrentPriorities.setSelection(0)}
@@ -113,14 +113,18 @@ class UpdateFragment : Fragment(R.layout.fragment_update) {
             val title = etCurrentTitle.text.toString()
             val description = etCurrentDescription.text.toString()
             val getPriority = spCurrentPriorities.selectedItem.toString()
-            val validation = sharedViewModel.verifyDataFromUser(title, description)
+            val validation = sharedViewModel.verifyDataFromUser(title, "a",description)
             if (validation) {
                 val updatedItem = ToDo(
                     toDo.id,
                     title,
+                    "",
+                    "",
                     sharedViewModel.parsePriority(getPriority),
                     description,
-                    imageUrl
+                    imageUrl,
+                    "",
+                    ""
                 )
                 toDoViewModel.updateData(updatedItem)
                 Toast.makeText(requireContext(), "Successfully updated!", Toast.LENGTH_SHORT).show()

@@ -2,8 +2,11 @@ package com.mertrizakaradeniz.notely.ui.list
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -43,10 +46,45 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+        setupSearch()
+        setupOnBackPress()
         setupRecyclerView()
         handleClickEvent()
         setupObserver()
         hideKeyboard(requireActivity())
+    }
+
+    private fun setupSearch() {
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s != null) {
+                    searchThroughDatabase(s.toString())
+                }
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                if (s != null) {
+                    searchThroughDatabase(s.toString())
+                }
+            }
+
+        })
+    }
+
+    private fun setupOnBackPress() {
+        val onBackPressedCallBack = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallBack
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -97,7 +135,7 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
             toDoListAdapter.toDoList = toDo
         })
         sharedViewModel.emptyDatabase.observe(viewLifecycleOwner, {
-            when(it) {
+            when (it) {
                 true -> {
                     binding.apply {
                         imgNoData.visibility = View.VISIBLE
@@ -115,7 +153,7 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
     }
 
     private fun handleClickEvent() {
-        binding.floatingActionButton.setOnClickListener {
+        binding.imgAddNoteMain.setOnClickListener {
             findNavController().navigate(R.id.action_ListFragment_to_addFragment)
         }
         toDoListAdapter.setOnItemClickListener {
@@ -123,20 +161,38 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
                 putParcelable(getString(R.string.todo), it)
             }
             findNavController().navigate(
-                R.id.action_ListFragment_to_updateFragment,
+                R.id.action_ListFragment_to_addFragment,
                 bundle
             )
+        }
+        binding.apply {
+            imgAddImage.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putString("action", "image")
+                }
+                findNavController().navigate(R.id.action_ListFragment_to_addFragment,bundle)
+            }
+            imgAddNote.setOnClickListener {
+                findNavController().navigate(R.id.action_ListFragment_to_addFragment)
+            }
+            imgWebLink.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putString("action", "url")
+                }
+                findNavController().navigate(R.id.action_ListFragment_to_addFragment,bundle)
+            }
         }
     }
 
     private fun setupRecyclerView() {
-        binding.rvList.apply {
+        binding.rvNotes.apply {
             adapter = toDoListAdapter
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             itemAnimator = SlideInUpAnimator().apply {
                 addDuration = 300
             }
             setHasFixedSize(true)
+            smoothScrollToPosition(0)
         }
         setupItemTouchEvent()
     }
@@ -169,7 +225,7 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
             }
         }
         ItemTouchHelper(itemTouchHelperCallback).apply {
-            attachToRecyclerView(binding.rvList)
+            attachToRecyclerView(binding.rvNotes)
         }
     }
 

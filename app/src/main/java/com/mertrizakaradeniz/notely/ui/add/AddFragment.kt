@@ -1,44 +1,72 @@
 package com.mertrizakaradeniz.notely.ui.add
 
+import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.util.Patterns
 import android.view.*
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.load
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.mertrizakaradeniz.notely.R
+import com.mertrizakaradeniz.notely.data.model.Priority
 import com.mertrizakaradeniz.notely.data.model.ToDo
 import com.mertrizakaradeniz.notely.databinding.FragmentAddBinding
+import com.mertrizakaradeniz.notely.databinding.LayoutAddUrlBinding
+import com.mertrizakaradeniz.notely.databinding.LayoutBottomSheetBinding
+import com.mertrizakaradeniz.notely.databinding.LayoutDeleteNoteBinding
 import com.mertrizakaradeniz.notely.ui.FirebaseViewModel
 import com.mertrizakaradeniz.notely.ui.SharedViewModel
 import com.mertrizakaradeniz.notely.ui.ToDoViewModel
 import com.mertrizakaradeniz.notely.ui.main.MainActivity
+import com.mertrizakaradeniz.notely.util.Constant.PERMISSION_EXTERNAL_STORAGE_REQUEST_CODE
 import com.mertrizakaradeniz.notely.util.Constant.REQUEST_CODE_IMAGE_PICK
 import com.mertrizakaradeniz.notely.util.Resource
+import com.vmadalin.easypermissions.EasyPermissions
+import com.vmadalin.easypermissions.dialogs.SettingsDialog
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
 import java.util.*
 
 @AndroidEntryPoint
-class AddFragment : Fragment(R.layout.fragment_add) {
+class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionCallbacks {
 
     private var _binding: FragmentAddBinding? = null
     private val binding get() = _binding!!
+    private var _bottomSheetBinding: LayoutBottomSheetBinding? = null
+    private val bottomSheetBinding get() = _bottomSheetBinding!!
+    private var _urlDialogBinding: LayoutAddUrlBinding? = null
+    private val urlDialogBinding get() = _urlDialogBinding!!
+    private var _deleteNoteDialogBinding: LayoutDeleteNoteBinding? = null
+    private val deleteNoteDialogBinding get() = _deleteNoteDialogBinding!!
 
     private val toDoViewModel: ToDoViewModel by viewModels()
     private val sharedViewModel: SharedViewModel by viewModels()
     private val firebaseViewModel: FirebaseViewModel by viewModels()
 
     private lateinit var toDo: ToDo
-    private lateinit var imageUrl: String
+    private var dialogAddURL: AlertDialog? = null
+    private var dialogDeleteNote: AlertDialog? = null
+    private lateinit var selectedImageUrl: String
+    private var selectedColor: String = "#333333"
     private val calendar: Calendar = Calendar.getInstance()
     private var currentFile: Uri? = null
     private var isAlarmSet = false
+    private lateinit var dialog: BottomSheetDialog
+    private var flag = false
+    private lateinit var action: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,16 +78,121 @@ class AddFragment : Fragment(R.layout.fragment_add) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog = BottomSheetDialog((requireContext()))
+        if (arguments?.get("action") != null) {
+            action = arguments?.get("action") as String
+        } else {
+            action = ""
+        }
+        if (arguments?.get(getString(R.string.todo)) != null) {
+            toDo = arguments?.get(getString(R.string.todo)) as ToDo
+            flag = true
+            populateUI()
+        } else {
+            initToDo()
+            flag = false
+        }
+        handleActionRequest()
+        initBottomSheet()
         setHasOptionsMenu(true)
+        setDateTime()
         handleClickEvent()
         binding.spPriorities.onItemSelectedListener = sharedViewModel.listener
+        setSubtitleIndicatorColor()
+        bottomSheetHandleClickEvent(dialog)
+    }
+
+    private fun handleActionRequest() {
+        if (action.isNotBlank()) {
+            when(action) {
+                "image" -> {
+                    requestStoragePermission()
+                }
+                "url" -> {
+                    initURLDialog()
+                    showAddURLDialog()
+                }
+            }
+        }
+    }
+
+    private fun initToDo() {
+        val priority = binding.spPriorities.selectedItem.toString()
+        selectedImageUrl = ""
+        toDo = ToDo(
+            0,
+            "",
+            "",
+            "",
+            sharedViewModel.parsePriority(priority),
+            "",
+            "",
+            "",
+            "",
+        )
+    }
+
+    private fun populateUI() {
+        binding.apply {
+            etNoteTitle.setText(toDo.title)
+            etNoteSubtitle.setText(toDo.subtitle)
+            etNote.setText(toDo.noteText)
+            tvDateTime.text = toDo.dateTime
+            if (toDo.imageUrl != null && toDo.imageUrl?.trim()!!.isNotEmpty()) {
+                imgNote.load(toDo.imageUrl)
+                imgNote.visibility = View.VISIBLE
+                imgRemoveImage.visibility = View.VISIBLE
+                selectedImageUrl = toDo.imageUrl!!
+            } else {
+                imgNote.visibility = View.GONE
+                imgRemoveImage.visibility = View.GONE
+            }
+            if (toDo.webLink != null && toDo.webLink?.trim()!!.isNotEmpty()) {
+                llWebURL.visibility = View.VISIBLE
+                tvWebURL.text = toDo.webLink
+            }
+            when (toDo.priority) {
+                Priority.HIGH -> {
+                    spPriorities.setSelection(0)
+                }
+                Priority.MEDIUM -> {
+                    spPriorities.setSelection(1)
+                }
+                Priority.LOW -> {
+                    spPriorities.setSelection(2)
+                }
+            }
+        }
+    }
+
+    private fun setDateTime() {
+        binding.tvDateTime.text =
+            SimpleDateFormat(
+                "EEEE, dd MMMM yyyy HH:mm a",
+                Locale.getDefault()
+            ).format(Date())
     }
 
     private fun handleClickEvent() {
-        binding.imageButton.setOnClickListener {
-            Intent(Intent.ACTION_GET_CONTENT).also {
-                it.type = "image/*"
-                startActivityForResult(it, REQUEST_CODE_IMAGE_PICK)
+        binding.apply {
+            imgSave.setOnClickListener {
+                insertToDo()
+            }
+            imgBack.setOnClickListener {
+                requireActivity().onBackPressed()
+            }
+            imageButton.setOnClickListener {
+                dialog.show()
+            }
+            imgRemoveWebUrl.setOnClickListener {
+                tvWebURL.text = null
+                llWebURL.visibility = View.GONE
+            }
+            imgRemoveImage.setOnClickListener {
+                imgNote.setImageBitmap(null)
+                imgNote.visibility = View.GONE
+                imgRemoveImage.visibility = View.GONE
+                selectedImageUrl = ""
             }
         }
     }
@@ -94,24 +227,34 @@ class AddFragment : Fragment(R.layout.fragment_add) {
 
     private fun insertToDo() {
         binding.apply {
-            val title = etTitle.text.toString()
-            val description = etDescription.text.toString()
+            val title = etNoteTitle.text.toString()
+            val subtitle = etNoteSubtitle.text.toString()
+            val noteText = etNote.text.toString()
+            val dateTime = tvDateTime.text.toString()
             val priority = spPriorities.selectedItem.toString()
-            val validation = sharedViewModel.verifyDataFromUser(title, description)
+            val validation = sharedViewModel.verifyDataFromUser(title, subtitle, noteText)
             if (validation) {
-                if (binding.imageView.drawable != null) {
+                if (binding.imgNote.drawable != null) {
                     getImageUrl()
                 } else {
-                    imageUrl = ""
+                    selectedImageUrl = ""
                 }
-                toDo = ToDo(
+                val newToDo = ToDo(
                     0,
                     title,
+                    dateTime,
+                    subtitle,
                     sharedViewModel.parsePriority(priority),
-                    description,
-                    imageUrl
+                    noteText,
+                    selectedImageUrl,
+                    selectedColor,
+                    ""
                 )
-                toDoViewModel.insertData(toDo)
+                newToDo.id = toDo.id
+                if (binding.llWebURL.visibility == View.VISIBLE) {
+                    newToDo.webLink = tvWebURL.text.toString()
+                }
+                toDoViewModel.insertData(newToDo)
                 Toast.makeText(
                     requireContext(),
                     "Successfully added!",
@@ -136,7 +279,11 @@ class AddFragment : Fragment(R.layout.fragment_add) {
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_IMAGE_PICK) {
             data?.data?.let {
                 currentFile = it
-                binding.imageView.load(it)
+                binding.imgNote.apply {
+                    load(it)
+                    visibility = View.VISIBLE
+                }
+                binding.imgRemoveImage.visibility = View.VISIBLE
                 firebaseViewModel.upload(currentFile!!)
             }
         }
@@ -148,11 +295,11 @@ class AddFragment : Fragment(R.layout.fragment_add) {
                 is Resource.Success -> {
                     (requireActivity() as MainActivity).hideProgressBar()
                     firebaseViewModel.filePath.observe(viewLifecycleOwner, { url ->
-                        imageUrl = url
+                        selectedImageUrl = url
                     })
                 }
                 is Resource.Error -> {
-                    imageUrl = ""
+                    selectedImageUrl = ""
                     (requireActivity() as MainActivity).hideProgressBar()
                     Toast.makeText(
                         requireContext(),
@@ -167,8 +314,220 @@ class AddFragment : Fragment(R.layout.fragment_add) {
         })
     }
 
+    private fun initBottomSheet() {
+        val bottomSheet = layoutInflater.inflate(R.layout.layout_bottom_sheet, null)
+        _bottomSheetBinding = LayoutBottomSheetBinding.inflate(
+            layoutInflater,
+            bottomSheet as ViewGroup,
+            false
+        )
+        dialog.setContentView(bottomSheetBinding.root)
+    }
+
+    private fun initURLDialog() {
+        val urlDialog = layoutInflater.inflate(R.layout.layout_add_url, null)
+        _urlDialogBinding = LayoutAddUrlBinding.inflate(
+            layoutInflater,
+            urlDialog as ViewGroup,
+            false
+        )
+    }
+
+    private fun initDeleteNoteDialog() {
+        val deleteDialog = layoutInflater.inflate(R.layout.layout_delete_note, null)
+        _deleteNoteDialogBinding = LayoutDeleteNoteBinding.inflate(
+            layoutInflater,
+            deleteDialog as ViewGroup,
+            false
+        )
+    }
+
+    private fun bottomSheetHandleClickEvent(dialog: BottomSheetDialog) {
+        bottomSheetBinding.apply {
+            viewColor1.setOnClickListener {
+                selectedColor = "#333333"
+                imageColor1.setImageResource(R.drawable.ic_done)
+                imageColor2.setImageResource(0)
+                imageColor3.setImageResource(0)
+                imageColor4.setImageResource(0)
+                imageColor5.setImageResource(0)
+                setSubtitleIndicatorColor()
+            }
+            viewColor2.setOnClickListener {
+                selectedColor = "#FDBE3B"
+                imageColor1.setImageResource(0)
+                imageColor2.setImageResource(R.drawable.ic_done)
+                imageColor3.setImageResource(0)
+                imageColor4.setImageResource(0)
+                imageColor5.setImageResource(0)
+                setSubtitleIndicatorColor()
+            }
+            viewColor3.setOnClickListener {
+                selectedColor = "#FF4B42"
+                imageColor1.setImageResource(0)
+                imageColor2.setImageResource(0)
+                imageColor3.setImageResource(R.drawable.ic_done)
+                imageColor4.setImageResource(0)
+                imageColor5.setImageResource(0)
+                setSubtitleIndicatorColor()
+            }
+            viewColor4.setOnClickListener {
+                selectedColor = "#3A52FC"
+                imageColor1.setImageResource(0)
+                imageColor2.setImageResource(0)
+                imageColor3.setImageResource(0)
+                imageColor4.setImageResource(R.drawable.ic_done)
+                imageColor5.setImageResource(0)
+                setSubtitleIndicatorColor()
+            }
+            viewColor5.setOnClickListener {
+                selectedColor = "#000000"
+                imageColor1.setImageResource(0)
+                imageColor2.setImageResource(0)
+                imageColor3.setImageResource(0)
+                imageColor4.setImageResource(0)
+                imageColor5.setImageResource(R.drawable.ic_done)
+                setSubtitleIndicatorColor()
+            }
+
+            if (toDo.color.trim().isNotEmpty()) {
+                bottomSheetBinding.apply {
+                    when (toDo.color) {
+                        "#FDBE3B" -> viewColor2.performClick()
+                        "#FF4B42" -> viewColor3.performClick()
+                        "#3A52FC" -> viewColor4.performClick()
+                        "##000000" -> viewColor5.performClick()
+                    }
+                }
+            }
+
+            llAddImage.setOnClickListener {
+                dialog.dismiss()
+                requestStoragePermission()
+            }
+            llAddUrl.setOnClickListener {
+                dialog.dismiss()
+                initURLDialog()
+                showAddURLDialog()
+            }
+
+            if (flag) {
+                llDeleteNote.visibility = View.VISIBLE
+                llDeleteNote.setOnClickListener {
+                    dialog.dismiss()
+                    initDeleteNoteDialog()
+                    showDeleteDialog()
+                }
+            }
+
+            llAddReminder.setOnClickListener {
+                dialog.dismiss()
+                setReminder()
+            }
+        }
+    }
+
+    private fun setSubtitleIndicatorColor() {
+        val gradientDrawable = binding.viewSubtitleIndicator.background as GradientDrawable
+        gradientDrawable.setColor(Color.parseColor(selectedColor))
+    }
+
+    private fun showDeleteDialog() {
+        if (dialogDeleteNote == null) {
+            AlertDialog.Builder(requireContext()).apply {
+                setView(deleteNoteDialogBinding.root)
+                dialogDeleteNote = create()
+            }
+            if (dialogDeleteNote?.window != null) {
+                dialogDeleteNote?.window?.setBackgroundDrawable(ColorDrawable(0))
+            }
+            deleteNoteDialogBinding.apply {
+                tvDeleteNote.setOnClickListener {
+                    toDoViewModel.deleteItem(toDo)
+                    dialogDeleteNote?.dismiss()
+                    findNavController().navigate(R.id.action_addFragment_to_ListFragment)
+                }
+                tvCancel.setOnClickListener {
+                    dialogDeleteNote?.dismiss()
+                }
+            }
+        }
+        dialogDeleteNote?.show()
+    }
+
+    private fun showAddURLDialog() {
+        if (dialogDeleteNote == null) {
+            AlertDialog.Builder(requireContext()).apply {
+                setView(urlDialogBinding.root)
+                dialogAddURL = create()
+            }
+
+            if (dialogAddURL?.window != null) {
+                dialogAddURL?.window?.setBackgroundDrawable(ColorDrawable(0))
+            }
+
+            urlDialogBinding.apply {
+                etUrl.requestFocus()
+                tvAdd.setOnClickListener {
+                    if (etUrl.text.toString().trim().isEmpty()) {
+                        Toast.makeText(requireContext(), "Enter URL", Toast.LENGTH_SHORT).show()
+                    } else if (!Patterns.WEB_URL.matcher(etUrl.text.toString()).matches()) {
+                        Toast.makeText(requireContext(), "Enter valid URL", Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        binding.apply {
+                            tvWebURL.text = etUrl.text.toString()
+                            llWebURL.visibility = View.VISIBLE
+                        }
+                        dialogAddURL?.dismiss()
+                    }
+                }
+                tvCancel.setOnClickListener {
+                    dialogAddURL?.dismiss()
+                }
+            }
+        }
+        dialogAddURL?.show()
+    }
+
+    private fun requestStoragePermission() {
+        EasyPermissions.requestPermissions(
+            this,
+            "You cannot choose image without Storage Permission.",
+            PERMISSION_EXTERNAL_STORAGE_REQUEST_CODE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
+    }
+
+    override fun onPermissionsDenied(requestCode: Int, perms: List<String>) {
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, listOf(perms.first()))) {
+            SettingsDialog.Builder(requireActivity()).build().show()
+        } else {
+            requestStoragePermission()
+        }
+    }
+
+    override fun onPermissionsGranted(requestCode: Int, perms: List<String>) {
+        Intent(Intent.ACTION_GET_CONTENT).also {
+            it.type = "image/*"
+            startActivityForResult(it, REQUEST_CODE_IMAGE_PICK)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+        _bottomSheetBinding = null
+        _urlDialogBinding = null
+        _deleteNoteDialogBinding = null
     }
 }

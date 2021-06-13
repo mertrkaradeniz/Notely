@@ -20,27 +20,27 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
-    private lateinit var appBarConfiguration: AppBarConfiguration
+    //private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setupNavigation()
-        supportActionBar?.elevation = 0f
+        //supportActionBar?.elevation = 0f
     }
 
     private fun setupNavigation() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
         navController = navHostFragment.navController
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.listFragment
-            )
-        )
+//        appBarConfiguration = AppBarConfiguration(
+//            setOf(
+//                R.id.listFragment
+//            )
+//        )
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
+        /*navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.signInFragment -> {
                     supportActionBar?.hide()
@@ -54,16 +54,8 @@ class MainActivity : AppCompatActivity() {
                     supportActionBar?.show()
                 }
             }
-        }
-        setupActionBarWithNavController(navController, appBarConfiguration)
-    }
-
-    override fun onNavigateUp(): Boolean {
-        return navController.navigateUp()
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+        }*/
+        //setupActionBarWithNavController(navController)
     }
 
     fun hideProgressBar() {

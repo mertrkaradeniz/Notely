@@ -23,7 +23,7 @@ fun NotificationManager.sendNotification(
         .setComponentName(MainActivity::class.java)
         .setArguments(bundle)
         .setGraph(R.navigation.nav_graph)
-        .setDestination(R.id.updateFragment)
+        .setDestination(R.id.addFragment)
         .createPendingIntent()
 
     val builder = NotificationCompat.Builder(
@@ -32,7 +32,7 @@ fun NotificationManager.sendNotification(
     )
         .setSmallIcon(R.drawable.ic_notification)
         .setContentTitle(toDo?.title)
-        .setContentText(toDo?.description)
+        .setContentText(toDo?.noteText)
         .setContentIntent(contentPendingIntent)
         .setAutoCancel(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)

@@ -11,4 +11,5 @@ object Constant {
     const val REQUEST_CODE: Int = 1
     const val NOTIFICATION_BUNDLE = "ToDo"
     const val BUNDLE = "bundle"
+    const val PERMISSION_EXTERNAL_STORAGE_REQUEST_CODE = 1
 }

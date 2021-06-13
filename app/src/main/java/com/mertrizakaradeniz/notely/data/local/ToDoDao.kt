@@ -7,10 +7,10 @@ import com.mertrizakaradeniz.notely.data.model.ToDo
 @Dao
 interface ToDoDao {
 
-    @Query("SELECT * FROM todo_table ORDER BY id ASC")
+    @Query("SELECT * FROM todo_table ORDER BY id DESC")
     fun getAllData(): LiveData<List<ToDo>>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertData(toDoData: ToDo)
 
     @Update

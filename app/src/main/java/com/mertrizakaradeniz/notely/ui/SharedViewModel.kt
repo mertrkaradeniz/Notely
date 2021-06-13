@@ -1,6 +1,7 @@
 package com.mertrizakaradeniz.notely.ui
 
 import android.app.Application
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.TextView
@@ -24,15 +25,36 @@ class SharedViewModel(application: Application) : AndroidViewModel(application) 
         override fun onNothingSelected(p0: AdapterView<*>?) {}
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             when (position) {
-                0 -> { (parent!!.getChildAt(0) as TextView).setTextColor(ContextCompat.getColor(application, R.color.red))}
-                1 -> { (parent!!.getChildAt(0) as TextView).setTextColor(ContextCompat.getColor(application, R.color.yellow))}
-                2 -> { (parent!!.getChildAt(0) as TextView).setTextColor(ContextCompat.getColor(application, R.color.green))}
+                0 -> {
+                    (parent!!.getChildAt(0) as TextView).setTextColor(
+                        ContextCompat.getColor(
+                            application,
+                            R.color.dark_red
+                        )
+                    )
+                }
+                1 -> {
+                    (parent!!.getChildAt(0) as TextView).setTextColor(
+                        ContextCompat.getColor(
+                            application,
+                            R.color.dark_yellow
+                        )
+                    )
+                }
+                2 -> {
+                    (parent!!.getChildAt(0) as TextView).setTextColor(
+                        ContextCompat.getColor(
+                            application,
+                            R.color.dark_green
+                        )
+                    )
+                }
             }
         }
     }
 
-    fun verifyDataFromUser(title: String, description: String): Boolean {
-        return !(title.isEmpty() || description.isEmpty())
+    fun verifyDataFromUser(title: String, subtitle: String, description: String): Boolean {
+        return !(title.isEmpty() || subtitle.isEmpty() || description.isEmpty())
     }
 
     fun parsePriority(priority: String): Priority {
