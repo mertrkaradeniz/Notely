@@ -45,4 +45,7 @@
     <string name="delete_note">Delete Note</string>
     <string name="are_you_sure_you_want_to_delete_this_note">Are you sure you want to delete this note?</string>
     <string name="set_reminder">Set Reminder</string>
+    <string name="action">action</string>
+    <string name="url">url</string>
+
 </resources>

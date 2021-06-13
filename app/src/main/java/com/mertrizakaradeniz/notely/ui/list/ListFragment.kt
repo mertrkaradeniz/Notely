@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.*
+import android.widget.GridLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
@@ -13,14 +14,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.mertrizakaradeniz.notely.R
 import com.mertrizakaradeniz.notely.adapter.ToDoListAdapter
 import com.mertrizakaradeniz.notely.databinding.FragmentListBinding
-import com.mertrizakaradeniz.notely.ui.SharedViewModel
-import com.mertrizakaradeniz.notely.ui.ToDoViewModel
 import com.mertrizakaradeniz.notely.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
@@ -32,7 +32,6 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
     private val binding get() = _binding!!
 
     private val toDoViewModel: ToDoViewModel by viewModels()
-    private val sharedViewModel: SharedViewModel by viewModels()
     private val toDoListAdapter: ToDoListAdapter by lazy { ToDoListAdapter() }
 
     override fun onCreateView(
@@ -45,20 +44,17 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
+        hideKeyboard(requireActivity())
+        setupRecyclerView()
+        setupObserver()
+        handleClickEvent()
         setupSearch()
         setupOnBackPress()
-        setupRecyclerView()
-        handleClickEvent()
-        setupObserver()
-        hideKeyboard(requireActivity())
     }
 
     private fun setupSearch() {
         binding.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s != null) {
@@ -71,7 +67,6 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
                     searchThroughDatabase(s.toString())
                 }
             }
-
         })
     }
 
@@ -87,17 +82,8 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
         )
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.list_fragment_menu, menu)
-
-        val search = menu.findItem(R.id.menu_search)
-        val searchView = search.actionView as? SearchView
-        searchView?.setOnQueryTextListener(this)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_delete_all -> confirmRemoval()
             R.id.menu_priority_high -> toDoViewModel.sortByHighPriority.observe(
                 viewLifecycleOwner, {
                     toDoListAdapter.toDoList = it
@@ -131,21 +117,24 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
 
     private fun setupObserver() {
         toDoViewModel.gelAllData.observe(viewLifecycleOwner, { toDo ->
-            sharedViewModel.checkIfDatabaseEmpty(toDo)
+            toDoViewModel.checkIfDatabaseEmpty(toDo)
             toDoListAdapter.toDoList = toDo
         })
-        sharedViewModel.emptyDatabase.observe(viewLifecycleOwner, {
+
+        toDoViewModel.emptyDatabase.observe(viewLifecycleOwner, {
             when (it) {
                 true -> {
                     binding.apply {
                         imgNoData.visibility = View.VISIBLE
                         tvNoData.visibility = View.VISIBLE
+                        imgDeleteAll.visibility = View.GONE
                     }
                 }
                 false -> {
                     binding.apply {
                         imgNoData.visibility = View.INVISIBLE
                         tvNoData.visibility = View.INVISIBLE
+                        imgDeleteAll.visibility = View.VISIBLE
                     }
                 }
             }
@@ -153,9 +142,6 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
     }
 
     private fun handleClickEvent() {
-        binding.imgAddNoteMain.setOnClickListener {
-            findNavController().navigate(R.id.action_ListFragment_to_addFragment)
-        }
         toDoListAdapter.setOnItemClickListener {
             val bundle = Bundle().apply {
                 putParcelable(getString(R.string.todo), it)
@@ -166,20 +152,46 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
             )
         }
         binding.apply {
-            imgAddImage.setOnClickListener {
-                val bundle = Bundle().apply {
-                    putString("action", "image")
-                }
-                findNavController().navigate(R.id.action_ListFragment_to_addFragment,bundle)
+            imgAddNoteMain.setOnClickListener {
+                findNavController().navigate(R.id.action_ListFragment_to_addFragment)
             }
             imgAddNote.setOnClickListener {
                 findNavController().navigate(R.id.action_ListFragment_to_addFragment)
             }
+            imgAddImage.setOnClickListener {
+                val bundle = Bundle().apply {
+                    putString(
+                        requireActivity().getString(R.string.action),
+                        requireActivity().getString(R.string.image)
+                    )
+                }
+                findNavController().navigate(R.id.action_ListFragment_to_addFragment, bundle)
+            }
             imgWebLink.setOnClickListener {
                 val bundle = Bundle().apply {
-                    putString("action", "url")
+                    putString(
+                        requireActivity().getString(R.string.action),
+                        requireActivity().getString(R.string.url)
+                    )
                 }
-                findNavController().navigate(R.id.action_ListFragment_to_addFragment,bundle)
+                findNavController().navigate(R.id.action_ListFragment_to_addFragment, bundle)
+            }
+            imgDeleteAll.setOnClickListener {
+                confirmRemoval()
+            }
+            imgLayout.setOnClickListener {
+                when (rvNotes.layoutManager) {
+                    is LinearLayoutManager -> {
+                        imgLayout.setImageResource(R.drawable.ic_layout_grid)
+                        rvNotes.layoutManager =
+                            StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                    }
+                    is StaggeredGridLayoutManager -> {
+                        imgLayout.setImageResource(R.drawable.ic_layout_linear)
+                        rvNotes.layoutManager = LinearLayoutManager(requireContext())
+
+                    }
+                }
             }
         }
     }
@@ -239,6 +251,7 @@ class ListFragment : Fragment(R.layout.fragment_list), SearchView.OnQueryTextLis
     }
 
     private fun confirmRemoval() {
+
         val builder = AlertDialog.Builder(requireContext())
         builder.setPositiveButton("Yes") { _, _ ->
             toDoViewModel.deleteAll()

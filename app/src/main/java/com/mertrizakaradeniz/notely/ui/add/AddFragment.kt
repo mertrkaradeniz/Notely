@@ -13,13 +13,11 @@ import android.os.Bundle
 import android.util.Patterns
 import android.view.*
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.snackbar.Snackbar
 import com.mertrizakaradeniz.notely.R
 import com.mertrizakaradeniz.notely.data.model.Priority
 import com.mertrizakaradeniz.notely.data.model.ToDo
@@ -28,8 +26,7 @@ import com.mertrizakaradeniz.notely.databinding.LayoutAddUrlBinding
 import com.mertrizakaradeniz.notely.databinding.LayoutBottomSheetBinding
 import com.mertrizakaradeniz.notely.databinding.LayoutDeleteNoteBinding
 import com.mertrizakaradeniz.notely.ui.FirebaseViewModel
-import com.mertrizakaradeniz.notely.ui.SharedViewModel
-import com.mertrizakaradeniz.notely.ui.ToDoViewModel
+import com.mertrizakaradeniz.notely.ui.list.ToDoViewModel
 import com.mertrizakaradeniz.notely.ui.main.MainActivity
 import com.mertrizakaradeniz.notely.util.Constant.PERMISSION_EXTERNAL_STORAGE_REQUEST_CODE
 import com.mertrizakaradeniz.notely.util.Constant.REQUEST_CODE_IMAGE_PICK
@@ -52,8 +49,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
     private var _deleteNoteDialogBinding: LayoutDeleteNoteBinding? = null
     private val deleteNoteDialogBinding get() = _deleteNoteDialogBinding!!
 
-    private val toDoViewModel: ToDoViewModel by viewModels()
-    private val sharedViewModel: SharedViewModel by viewModels()
+    private val toDoAddViewModel: ToDoAddViewModel by viewModels()
     private val firebaseViewModel: FirebaseViewModel by viewModels()
 
     private lateinit var toDo: ToDo
@@ -79,10 +75,10 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog = BottomSheetDialog((requireContext()))
-        if (arguments?.get("action") != null) {
-            action = arguments?.get("action") as String
+        action = if (arguments?.get(requireActivity().getString(R.string.action)) != null) {
+            arguments?.get(requireActivity().getString(R.string.action)) as String
         } else {
-            action = ""
+            ""
         }
         if (arguments?.get(getString(R.string.todo)) != null) {
             toDo = arguments?.get(getString(R.string.todo)) as ToDo
@@ -97,7 +93,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
         setHasOptionsMenu(true)
         setDateTime()
         handleClickEvent()
-        binding.spPriorities.onItemSelectedListener = sharedViewModel.listener
+        binding.spPriorities.onItemSelectedListener = toDoAddViewModel.listener
         setSubtitleIndicatorColor()
         bottomSheetHandleClickEvent(dialog)
     }
@@ -105,10 +101,10 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
     private fun handleActionRequest() {
         if (action.isNotBlank()) {
             when(action) {
-                "image" -> {
+                requireActivity().getString(R.string.image) -> {
                     requestStoragePermission()
                 }
-                "url" -> {
+                requireActivity().getString(R.string.url) -> {
                     initURLDialog()
                     showAddURLDialog()
                 }
@@ -124,7 +120,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
             "",
             "",
             "",
-            sharedViewModel.parsePriority(priority),
+            toDoAddViewModel.parsePriority(priority),
             "",
             "",
             "",
@@ -210,7 +206,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
     }
 
     private fun setReminder() {
-        toDoViewModel.cancelNotification()
+        toDoAddViewModel.cancelNotification()
         val timeSetListener = TimePickerDialog.OnTimeSetListener { _, hour, minute ->
             calendar.set(Calendar.HOUR_OF_DAY, hour)
             calendar.set(Calendar.MINUTE, minute)
@@ -232,7 +228,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
             val noteText = etNote.text.toString()
             val dateTime = tvDateTime.text.toString()
             val priority = spPriorities.selectedItem.toString()
-            val validation = sharedViewModel.verifyDataFromUser(title, subtitle, noteText)
+            val validation = toDoAddViewModel.verifyDataFromUser(title, subtitle, noteText)
             if (validation) {
                 if (binding.imgNote.drawable != null) {
                     getImageUrl()
@@ -244,7 +240,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
                     title,
                     dateTime,
                     subtitle,
-                    sharedViewModel.parsePriority(priority),
+                    toDoAddViewModel.parsePriority(priority),
                     noteText,
                     selectedImageUrl,
                     selectedColor,
@@ -254,7 +250,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
                 if (binding.llWebURL.visibility == View.VISIBLE) {
                     newToDo.webLink = tvWebURL.text.toString()
                 }
-                toDoViewModel.insertData(newToDo)
+                toDoAddViewModel.insertData(newToDo)
                 Toast.makeText(
                     requireContext(),
                     "Successfully added!",
@@ -269,7 +265,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
                 ).show()
             }
             if (isAlarmSet) {
-                toDoViewModel.setupNotification(calendar, toDo)
+                toDoAddViewModel.setupNotification(calendar, toDo)
             }
         }
     }
@@ -443,7 +439,7 @@ class AddFragment : Fragment(R.layout.fragment_add), EasyPermissions.PermissionC
             }
             deleteNoteDialogBinding.apply {
                 tvDeleteNote.setOnClickListener {
-                    toDoViewModel.deleteItem(toDo)
+                    toDoAddViewModel.deleteItem(toDo)
                     dialogDeleteNote?.dismiss()
                     findNavController().navigate(R.id.action_addFragment_to_ListFragment)
                 }
